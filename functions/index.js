@@ -1,32 +1,27 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const { onRequest } = require('firebase-functions/v2/https')
+const admin = require('firebase-admin')
+const { getFirestore } = require('firebase-admin/firestore')
+const process = require('node:process')
+const cors = require('cors')({ origin: true, methods: ['GET', 'OPTIONS'] })
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+admin.initializeApp()
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
-
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
-
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+exports.countBooks = onRequest(
+  { region: 'us-central1', maxInstances: 2, invoker: 'public' },
+  (req, res) =>
+    cors(req, res, async () => {
+      res.set('Cache-Control', 'no-store')
+      if (req.method !== 'GET') {
+        res.set('Allow', 'GET, OPTIONS')
+        return res.status(405).json({ error: 'Method not allowed' })
+      }
+      try {
+        const databaseId = process.env.FIRESTORE_EMULATOR_HOST ? '(default)' : 'efolio'
+        const snapshot = await getFirestore(databaseId).collection('books').get()
+        return res.status(200).json({ count: snapshot.size })
+      } catch (error) {
+        console.error('Error counting books:', error.message)
+        return res.status(500).json({ error: 'Error counting books' })
+      }
+    })
+)

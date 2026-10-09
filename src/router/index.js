@@ -1,40 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import AboutView from '../views/AboutView.vue'
-import FirebaseSigninView from '../views/FirebaseSigninView.vue'
-import FirebaseRegisterView from '../views/FirebaseRegisterView.vue'
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: AboutView
-  },
-  {
-    path: '/FireLogin',
-    name: 'FireLogin',
-    component: FirebaseSigninView
-  },
-  {
-    path: '/FireRegister',
-    name: 'FireRegister',
-    component: FirebaseRegisterView
-  },
-  {
-    path: '/GetBookCount',
-    name: 'GetBookCount',
-    component: GetBookCountView
-  }
+  { path: '/', name: 'Home', component: () => import('../views/HomeView.vue') },
+  { path: '/about', name: 'About', component: () => import('../views/AboutView.vue') },
+  { path: '/FireLogin', alias: '/login', name: 'FireLogin', component: () => import('../views/FirebaseSigninView.vue') },
+  { path: '/FireRegister', name: 'FireRegister', component: () => import('../views/FirebaseRegisterView.vue') },
+  { path: '/addbook', name: 'AddBook', component: () => import('../views/AddBookView.vue') },
+  { path: '/GetBookCount', name: 'GetBookCount', component: () => import('../views/GetBookCountView.vue') },
+  { path: '/WeatherCheck', alias: '/GetWeather', name: 'GetWeather', component: () => import('../views/WeatherView.vue') },
+  { path: '/CountBookAPI', name: 'CountBookAPI', component: () => import('../views/CountBookAPI.vue') }
 ]
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
-
-export default router
+export default createRouter({ history: createWebHistory(import.meta.env.BASE_URL), routes })

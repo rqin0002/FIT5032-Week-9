@@ -57,6 +57,20 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /books/{bookId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasAll(['isbn', 'name'])
+        && request.resource.data.keys().hasOnly(['isbn', 'name'])
+        && request.resource.data.isbn is int
+        && request.resource.data.isbn > 0
+        && request.resource.data.isbn <= 9007199254740991
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 200;
+      allow delete: if request.auth != null;
+    }
+
     // Firebase Auth can issue a token before email verification. Protected
     // application data requires verification independently of the browser UI.
     function hasVerifiedIdentity() {

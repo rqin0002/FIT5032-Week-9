@@ -1,51 +1,39 @@
 <template>
-  <section class="container py-4">
-    <h1>Book Counter</h1>
-    <button
-      type="button"
-      class="btn btn-primary mt-3"
-      :disabled="loading"
-      @click="getBookCount"
-    >Get Book Count</button>
-    <p v-if="loading" class="mt-3" role="status">Loading book count...</p>
-    <p v-if="count !== null" class="mt-3" role="status">Total number of books: {{ count }}</p>
-    <p v-if="error" class="mt-3 text-danger" role="alert">{{ error }}</p>
-  </section>
+  <p v-if="loading" class="p-3" role="status">Loading book count...</p>
+  <p v-if="error" class="p-3 text-danger" role="alert">{{ error }}</p>
+  <pre v-if="jsondata !== null" class="p-3 m-0">{{ jsondata }}</pre>
 </template>
 
 <script setup>
 import axios from 'axios'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { collection, getCountFromServer } from 'firebase/firestore'
 import { db } from '../firebase/init.js'
 import { countBooksUrl } from '../config.js'
 
-const count = ref(null)
+const jsondata = ref(null)
 const error = ref(null)
 const loading = ref(false)
 
-const getBookCount = async () => {
-  if (loading.value) return
-
+const getBookCountAPI = async () => {
   loading.value = true
-  count.value = null
+  jsondata.value = null
   error.value = null
-
   try {
-    let result
+    let responseData
     if (countBooksUrl) {
       const response = await axios.get(countBooksUrl, { timeout: 15000 })
-      result = response.data?.count
+      responseData = response.data
     } else {
       const snapshot = await getCountFromServer(collection(db, 'books'))
-      result = snapshot.data().count
+      responseData = { count: snapshot.data().count }
     }
 
-    if (!Number.isSafeInteger(result) || result < 0) {
+    if (!Number.isSafeInteger(responseData?.count) || responseData.count < 0) {
       throw new Error('Invalid book count response')
     }
 
-    count.value = result
+    jsondata.value = JSON.stringify(responseData, null, 2)
   } catch {
     error.value = countBooksUrl
       ? 'Error fetching book count. Check the deployed countBooks function URL and its logs.'
@@ -54,4 +42,6 @@ const getBookCount = async () => {
     loading.value = false
   }
 }
+
+onMounted(getBookCountAPI)
 </script>

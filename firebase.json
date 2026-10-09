@@ -1,9 +1,8 @@
 {
   "firestore": {
-    "database": "(default)",
-    "location": "australia-southeast2",
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+    "database": "efolio",
+    "rules": "firestore.efolio.rules",
+    "indexes": "firestore.efolio.indexes.json"
   },
   "functions": [
     {

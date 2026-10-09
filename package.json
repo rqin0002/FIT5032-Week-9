@@ -7,9 +7,17 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server.js",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "start": "vite",
+    "lint": "eslint .",
+    "format": "prettier --write src/",
+    "server": "node server.js",
+    "lint:fix": "eslint . --fix",
+    "lint:functions": "npm --prefix functions run lint",
+    "test": "node --test tests/*.test.cjs",
+    "emulators": "node scripts/emulators.mjs",
+    "seed:books": "node scripts/seed-books.mjs",
+    "seed:books:cloud": "node scripts/seed-books-cloud.mjs",
+    "check:source": "node scripts/check-source.mjs"
   },
   "dependencies": {
     "@primeuix/themes": "^3.0.0",
@@ -34,6 +42,11 @@
     "prettier": "^3.2.5",
     "vite": "^8.2.2",
     "vite-plugin-vue-devtools": "^8.2.1",
-    "vue-eslint-parser": "^10.4.1"
+    "vue-eslint-parser": "^10.4.1",
+    "@vue/compiler-sfc": "^3.5.43",
+    "@babel/parser": "^7.29.9"
+  },
+  "engines": {
+    "node": ">=22.18.0"
   }
 }

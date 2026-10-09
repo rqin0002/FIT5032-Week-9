@@ -26,5 +26,13 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-
+firestore*
+firebase.*
 *.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+.emulator-data/
+.firebase/
+tests/
