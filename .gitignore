@@ -35,4 +35,5 @@ firebase.*
 !.env.example
 .emulator-data/
 .firebase/
+.wrangler/
 tests/
